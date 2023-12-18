@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<head>
+    <link rel="stylesheet" href="/css/style.css">
+    <title> Татошка Услуги</title>
+</head>
+
+<body>
+    <%- include ('blocks/header') -%>
+
+
+        <div class="serv-h2">
+            <h2>Наши услуги</h2>
+        </div>
+
+
+        <div class="serv-icon"> </div>
+
+
+        <script>
+
+            function ready() {
+                fetch('/data')
+                    .then(response => response.json())
+                    .then(obj => insertHTMLservices(obj))
+                    .then(a => addToggleEffect())
+                    .then(findDataForPOST());
+            }
+
+            function findDataForPOST() {
+                elem = document.querySelector(".serv-icon");
+                elem.onclick = function (event) {
+                    let text = null;
+                    let now = new Date().getTime();
+                    let dataPost = { section: null, time: now };
+                    let target = event.target;
+                    let className = target.classList[0];
+                    if (className == "serv-list-item") {
+                        dataPost.section = target.firstElementChild.firstElementChild.innerHTML;
+                    } else if (className == "item-oper") {
+                        dataPost.section = target.firstElementChild.innerHTML;
+                    } else if (className == "showPrice") {
+                        dataPost.section = target.previousElementSibling.innerHTML;
+                    } else if (target.tagName == "P" && target.classList[0] != "price") {
+                        dataPost.section = target.innerHTML;
+                    }
+                    console.log(dataPost)
+                    fetchToClick(dataPost);
+                }
+            }
+
+
+
+            document.addEventListener("DOMContentLoaded", ready);
+
+            function fetchToClick(dataPost) {
+                if (dataPost.section != null) {
+                    fetch('/click', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json;charset=utf-8'
+                        },
+                        body: JSON.stringify(dataPost)
+                    })
+                }
+            }
+            function addToggleEffect() {
+                let menuElem = document.querySelectorAll('.serv-icon-info');
+                menuElem.forEach(element => {
+                    let titleElem = element.querySelector('.name-of-operation');
+                    titleElem.onclick = function () {
+                        element.classList.toggle('open');
+                    };
+                });
+
+                let newMenuElem = document.querySelectorAll('.serv-list-item');
+                newMenuElem.forEach(element => {
+                    let Elem = element.querySelector('.item-oper');
+                    Elem.onclick = function () {
+                        element.classList.toggle('open');
+                    };
+                });
+            }
+
+            function insertHTMLservices(servises) {
+                let arSec = [];
+                servises.forEach(function (item, index, array) {
+                    let title = item.sec_title;
+                    if (!arSec.includes(title)) {
+                        arSec.push(title);
+                    }
+                });
+                let arrOb = [];
+                for (let i = 0; i < arSec.length; i++) {
+                    let someServises = servises.filter(item => item.sec_title == arSec[i]);
+
+                    arrOb.push({ section: arSec[i], serv: someServises })
+                }
+                let serv_icon = document.querySelector('.serv-icon');
+                for (let i = 0; i < arrOb.length; i++) {
+                    serv_icon.insertAdjacentHTML("beforeend", `<div class="serv-icon-info"><div class="name-of-operation">
+                    <span class="title">${arrOb[i].section}</span>
+                    <div class="plus"></div>
+                </div> <ul></ul> </div>`);
+
+                    for (let j = 0; j < arrOb[i].serv.length; j++) {
+                        let serv_icon_info_ul = document.querySelector(`.serv-icon-info:nth-of-type(${i + 1})  ul`);
+
+                        serv_icon_info_ul.insertAdjacentHTML("beforeend", `<li class="serv-list-item">
+                        <div class="item-oper">
+                            <p class="">${arrOb[i].serv[j].ser_title}</p>
+                            <div class="showPrice"></div>
+                        </div>
+                        <p class="price">${arrOb[i].serv[j].price}</p>
+                    </li>`)
+                    }
+                }
+            }
+        </script>
+        
+
+        <%- include ('blocks/footer') -%>
+</body>

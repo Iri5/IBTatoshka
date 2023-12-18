@@ -1,0 +1,312 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <style>
+    .price {
+      align-self: last baseline;
+      font-size: 20px;
+
+      font-style: italic;
+    }
+
+    .name-of-operation {
+      display: flex;
+      width: 40%;
+      justify-content: space-between;
+      border-bottom: 3px solid #70b3f1;
+      border-radius: 10px;
+    }
+
+    .item-oper {
+      display: flex;
+      width: 500px;
+      justify-content: space-between;
+    }
+
+    .title {
+      font-size: 24px;
+      margin-left: 50px;
+    }
+
+    .serv-icon-info.open .plus {
+      width: 28px;
+      content: url(img/ArrowUp.svg);
+    }
+
+    .plus {
+      width: 28px;
+
+      background-repeat: no-repeat;
+      margin-right: 50px;
+      background-position: center center;
+      content: url(img/Arrow\ 1.svg);
+    }
+
+    .showPrice {
+      content: url(img/ShowPrice\ 3.svg);
+      width: 130px;
+      margin-left: 20px;
+    }
+
+    .serv-list-item.open .showPrice {
+      content: url(img/NonePrice\ 2.svg);
+      width: 130px;
+      margin-left: 20px;
+    }
+
+    .serv-icon-info ul {
+      margin: 0;
+      list-style: none;
+      padding-left: 20px;
+      display: none;
+    }
+
+    .serv-icon-info .name-of-operation {
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .serv-icon-info .name-of-operation::before {
+      font-size: 80%;
+      color: green;
+    }
+
+    .serv-icon-info.open ul {
+      display: block;
+      align-items: flex-start;
+    }
+
+    .serv-icon-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 30px;
+    }
+
+    .serv-icon-info.open .serv-list-item .price {
+      margin: 0;
+      list-style: none;
+      padding-left: 20px;
+      display: none;
+    }
+
+    .serv-icon-info.open .serv-list-item .item-oper {
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .serv-icon-info.open .serv-list-item .item-oper::before {
+      font-size: 80%;
+      color: green;
+    }
+
+    .serv-icon-info.open .serv-list-item.open .price {
+      display: block;
+    }
+
+    .serv-icon-info.open .serv-list-item {
+      display: flex;
+      flex-direction: column;
+      align-items: baseline;
+      margin-top: 0px;
+    }
+
+    .menu ul {
+      margin: 0;
+      list-style: none;
+      padding-left: 20px;
+      display: none;
+    }
+
+    .menu .title {
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .menu .title::before {
+      content: '+';
+      font-size: 80%;
+      color: green;
+    }
+
+    .menu.open .title::before {
+      content: '- ';
+    }
+
+    .menu.open ul {
+      display: block;
+    }
+
+    div {
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="serv-icon" onclick="serv()"> </div>
+  <script>
+
+    function ready() {
+      fetch('/userjson.json')
+        .then(response => response.json())
+
+        .then(obj => insertHTMLservices(obj))
+        .then(a => addToggleEffect())
+        .then(findDataForPOST());
+    }
+
+
+    function findDataForPOST() {
+      elem = document.querySelector(".serv-icon");
+      elem.onclick = function (event) {
+        let text = null;
+        let now = new Date().getTime();
+        let dataPost = { section: null, time: now };
+        let target = event.target;
+        let className = target.classList[0];
+        if (className == "serv-list-item") {
+          dataPost.section = target.firstElementChild.firstElementChild.innerHTML;
+        } else if (className == "item-oper") {
+          dataPost.section = target.firstElementChild.innerHTML;
+        } else if (className == "showPrice") {
+          dataPost.section = target.previousElementSibling.innerHTML;
+        } else if (target.tagName == "P" && target.classList[0] != "price") {
+          dataPost.section = target.innerHTML;
+        }
+        console.log(dataPost)
+        fetchToClick(dataPost);
+      }
+    }
+
+
+
+    document.addEventListener("DOMContentLoaded", ready);
+
+    function fetchToClick(dataPost) {
+      if (dataPost.section != null) {
+        fetch('/click', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+          },
+          body: JSON.stringify(dataPost)
+        })
+      }
+    }
+    function addToggleEffect() {
+      let menuElem = document.querySelectorAll('.serv-icon-info');
+      menuElem.forEach(element => {
+        let titleElem = element.querySelector('.name-of-operation');
+
+        titleElem.onclick = function () {
+          element.classList.toggle('open');
+        };
+      });
+
+      let newMenuElem = document.querySelectorAll('.serv-list-item');
+      newMenuElem.forEach(element => {
+        let Elem = element.querySelector('.item-oper');
+
+        Elem.onclick = function () {
+          element.classList.toggle('open');
+
+        };
+      });
+    }
+    function insertHTMLservices(servises) {
+      let arSec = [];
+      servises.forEach(function (item, index, array) {
+        let title = item.sec_title;
+        if (!arSec.includes(title)) {
+          arSec.push(title);
+        }
+      });
+      let arrOb = [];
+
+      for (let i = 0; i < arSec.length; i++) {
+        let someServises = servises.filter(item => item.sec_title == arSec[i]);
+
+        arrOb.push({ section: arSec[i], serv: someServises })
+      }
+      let serv_icon = document.querySelector('.serv-icon');
+      for (let i = 0; i < arrOb.length; i++) {
+        serv_icon.insertAdjacentHTML("beforeend", `<div class="serv-icon-info"><div class="name-of-operation">
+                <span class="title">${arrOb[i].section}</span>
+                <div class="plus"></div>
+            </div> <ul></ul> </div>`);
+
+        for (let j = 0; j < arrOb[i].serv.length; j++) {
+          let serv_icon_info_ul = document.querySelector(`.serv-icon-info:nth-of-type(${i + 1})  ul`);
+
+          serv_icon_info_ul.insertAdjacentHTML("beforeend", `<li class="serv-list-item">
+                    <div class="item-oper">
+                        <p class="">${arrOb[i].serv[j].ser_title}</p>
+                        <div class="showPrice"></div>
+                    </div>
+                    <p class="price">${arrOb[i].serv[j].price}</p>
+                </li>`)
+        }
+      }
+
+    }
+  </script>
+  <div>
+    <canvas id="myChart"></canvas>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    //let response = await fetch('/1');
+    //if (response.ok){
+    //  let json =await response.json()
+    //}
+    fetch('/1')
+      .then(response => response.json())
+      .then(function (obj) {
+        console.log(obj);
+        acc = { sec_title: [], c: [] };
+        obj.forEach(function (item, index, array) {
+          acc.sec_title.push(item.sec_title);
+          acc.c.push(item.c);
+        })
+        console.log(acc)
+        chart(acc.sec_title, acc.c);
+      })
+
+    function chart( lab, dat) {
+      const ctx = document.getElementById('myChart');
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          //labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+          labels: lab,
+          datasets: [{
+            label: '# of Votes',
+            //data: [12, 19, 3, 5, 2, 3],
+            data: dat,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+  </script>
+
+
+
+
+</body>
+
+</html>

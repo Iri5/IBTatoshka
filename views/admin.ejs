@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+
+<head>
+    <link rel="stylesheet" href="/css/style.css">
+    <title> Татошка Админка</title>
+</head>
+
+<body>
+    <%- include ('blocks/header') -%>
+
+    <div class="admin-container">
+        <div class="admin-container_head">
+            <div class="admin-table_name">Пользователи системы</div>
+
+            
+        </div>
+        <table id="users" class="menu table">
+            <tr>
+                <th>Имя</th>
+                <th>Логин</th>
+                <th>Пароль</th>
+            </tr>
+            <% for(let i=0; i<goods.length; i++){ %>
+                <tr>
+                    <td class="name">
+                        <%=goods[i].name %>
+                    </td>
+                    <td class="email">
+                        <%=goods[i].login %>
+                    </td>
+                    <td class="login">
+                        <%=goods[i].password %>
+                    </td>
+                    
+                </tr>
+                <%} %>
+
+        </table>
+    </div>
+
+    <div id="modalUserExist" class="modal " style="z-index: 2;">
+        <div class="modal_content-warning  form_addperson_block_content">
+            <div  class="modal_close"></div>
+            <div class="modal_body-confirm">
+                <p>Пользователь с данным логином существует</p>
+            </div>
+        </div>
+    </div>
+
+
+
+
+        <div class="serv-icon"> </div>
+        <div class="con" style="width: 100%; display: flex; justify-content: center; margin-top: 50px;">
+            <div style="width: 70%">
+                <canvas id="myChart" width="500px"></canvas>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            /*document.addEventListener("DOMContentLoaded", ready);
+            function ready() {
+                let ar = {};
+                ar.pass = prompt('Введите пароль');
+
+                fetch('/password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify(ar)
+                })
+                    .then(response => response.json())
+                    .then(function (response) {
+                        console.log(response);
+                        if (response[0] == 1) {
+                            fetch('/chart')
+                                .then(response => response.json())
+                                .then(function (obj) {
+                                    console.log(obj);
+                                    acc = { sec_title: [], c: [] };
+                                    obj.forEach(function (item, index, array) {
+                                        acc.sec_title.push(item.sec_title);
+                                        acc.c.push(item.c);
+                                    })
+                                    console.log(acc)
+                                    chart(acc.sec_title, acc.c);
+                                })
+                        }
+                    })
+            }*/
+            //let response = await fetch('/1');
+            //if (response.ok){
+            //  let json =await response.json()
+            //}
+
+            fetch('/chart')
+                .then(response => response.json())
+                .then(function (obj) {
+                    console.log(obj);
+                    acc = { sec_title: [], c: [] };
+                    obj.forEach(function (item, index, array) {
+                        acc.sec_title.push(item.sec_title);
+                        acc.c.push(item.c);
+                    })
+                    console.log(acc)
+                    chart(acc.sec_title, acc.c);
+                })
+            function chart(lab, dat) {
+                const ctx = document.getElementById('myChart');
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        //labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                        labels: lab,
+                        datasets: [{
+                            label: '# of Votes',
+                            //data: [12, 19, 3, 5, 2, 3],
+                            data: dat,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+        </script>
+
+
+        <%- include ('blocks/footer') -%>
+</body>
