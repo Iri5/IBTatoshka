@@ -7,10 +7,13 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <div><%=goods.name%></div>
-    <div><%=goods.login%></div>
-    <div><%=goods.pass%></div>
-    <div><%=goods.secret%></div>
+    <%for(let user of goods) {%>
+        <div>Имя: <%=user.name%></div>
+        <div>Логин: <%=user.login%></div>
+        <div>Пароль: <%=user.password%></div>
+        <div>Секретная информация: <%=user.secret%></div>
+        <div>Хэш пароля: <%=user.hash%></div>
+    <%}%>
 
 </body>
 </html>

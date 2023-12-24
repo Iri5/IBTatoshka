@@ -117,9 +117,10 @@ app.get('/auth', (req, res) => {
             name: data[0].name,
             login: data[0].login,
             pass: data[0].password,
-            secret: data[0].secret
+            secret: data[0].secret,
+            hash: data[0].hash
           }
-          currentPerson = good;
+          currentPerson = data;
           res.redirect('/user');
           break;
       }
