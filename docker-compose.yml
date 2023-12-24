@@ -1,0 +1,10 @@
+services:
+  db: 
+    build: ./
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=irina
+      - MYSQL_DATABASE=vetbd
+      - MYSQL_HOST=localhost
+    ports:
+      - 3306:3306
