@@ -6,10 +6,37 @@
     <title>Document</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
-    <div><%=goods.name%></div>
-    <div><%=goods.secret%></div>
-    <div><%=goods.name%></div>
-
+<body class="body-user">
+    <header>
+        <div class="header">
+            <div class="header__logo">
+                <div>
+                    <img src="img/logo.svg" alt="ЛогоТатошка" width="70px" height="59px">
+                </div>
+            </div>
+            <div class="header__menu">
+                <ul class="menu-items">
+                    <li><a href="index.html">Главная</a> </li>
+                    <li><a href="doctors.html">Врачи</a></li>
+                    <li><a href="services.html">Услуги</a></li>
+                    <li><a href="contact.html">Контакты</a></li>
+                </ul>
+                
+            </div>
+            <div class="header__contacts">
+                <a href="index.html" >
+                    <img src="img/logout.svg" alt="Войти" width="25px" height="25px">
+                </a>
+            </div>
+        </div>
+        
+    </header>
+    <div class="user-wrapper">
+        <div><%=goods.name%></div>
+        <div><%=goods.secret%></div>
+        <div><%=goods.name%></div>
+    </div>
+    
+    <%- include ('blocks/footer') -%>
 </body>
 </html>
