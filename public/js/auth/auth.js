@@ -6,11 +6,11 @@ function serializeForm(formNode) {
     return dataToServer;
 }
 async function sendData(data) {
-    return await fetch('/auth', {
+    let {login, pass} = JSON.parse(data);
+    return await fetch(`/auth?login=${login}&pass=${pass}`, {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json;charset=utf-8',
-            sendData: data
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
     })
 }

@@ -3,6 +3,7 @@ const express = require('express')
 const app = express();
 const urlencodedParser = express.urlencoded({ extended: false });
 const jsonParser = express.json();
+const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 
 const pool = mysql.createPool({
@@ -14,6 +15,7 @@ const pool = mysql.createPool({
 let currentPerson = {};
 app.set("view engine", "ejs");
 app.use(express.static('public'))
+app.use(bodyParser.urlencoded({ extended: false }));
 app.get('/', (req, res) => {
   res.render('index');
 })
@@ -31,11 +33,11 @@ app.get('/services.html', (req, res) => {
 })
 app.get('/admin', (req, res) => {
   let query = 'SELECT * FROM vetbd.users'
-  pool.query(query, function(err,data){
+  pool.query(query, function (err, data) {
     if (err) return console.log(err);
-    res.render('admin', {goods: data});
-  }) 
-  
+    res.render('admin', { goods: data });
+  })
+
 })
 app.get('/authPage', (req, res) => {
   res.render('auth');
@@ -69,13 +71,13 @@ app.post('/click', jsonParser, (req, res) => {
   });
 })
 app.get('/user', (req, res) => {
-  res.render('user', {goods: currentPerson});
+  res.render('user', { goods: currentPerson });
 })
 app.get('/forgotpass', (req, res) => {
   console.log('forgotpass');
   console.log(req.headers.senddata);
   let query = 'SELECT * FROM vetbd.users where login = ?;'
-  pool.query(query, [req.headers.senddata ], function (err, data) {
+  pool.query(query, [req.headers.senddata], function (err, data) {
     if (err) return console.log(err);
     if (data.length == 0) {
       res.sendStatus(403)
@@ -87,10 +89,15 @@ app.get('/forgotpass', (req, res) => {
   })
 })
 //АВТОРИЗАЦИЯ
-app.get('/auth', jsonParser, (req, res) => {
-  let user = JSON.parse(req.headers.senddata);
-  let query = 'SELECT * FROM vetbd.users where login = ? and password = ?;'
-  pool.query(query, [user.login, user.pass], function (err, data) {
+app.get('/auth', (req, res) => {
+  let body = decodeURI(req._parsedUrl.query);
+  let list = body.split('&');
+  let login = list[0].match(/(?<=\=).*/g);
+  let pass = list[1].match(/(?<=\=).*/g);
+  
+  console.log(login, pass);
+  let query = `SELECT * FROM vetbd.users where login = "${login[0]}" and password = "${pass[0]}"`
+  pool.query(query, function (err, data) {
     if (err) return console.log(err);
     if (data.length == 0) {
       res.sendStatus(403)
@@ -105,16 +112,15 @@ app.get('/auth', jsonParser, (req, res) => {
           break;
 
         case '1':
-          console.log('user')
           res.status = 200;
           let good = {
             name: data[0].name,
+            login: data[0].login,
+            pass: data[0].password,
             secret: data[0].secret
           }
-          console.log('user1')
           currentPerson = good;
           res.redirect('/user');
-          // res.render('user', {goods: good});
           break;
       }
     }
@@ -133,6 +139,3 @@ app.post('/password', jsonParser, (req, res) => {
 app.listen(3000, () => {
   console.log('Server started: http://localhost:3000');
 })
-
-
-
