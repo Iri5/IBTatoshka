@@ -31,6 +31,21 @@ app.get('/doctors.html', (req, res) => {
 app.get('/services.html', (req, res) => {
   res.render('services');
 })
+app.get('/greeting', (req, res) => {
+  res.render('greeting');
+})
+app.get('/accesscontrol', (req, res) => {
+  res.render('accesscontrol');
+})
+app.get('/injection', (req, res) => {
+  res.render('injection');
+})
+app.get('/identification', (req, res) => {
+  res.render('identification');
+})
+app.get('/loging', (req, res) => {
+  res.render('loging');
+})
 app.get('/admin', (req, res) => {
   let query = 'SELECT * FROM vetbd.users'
   pool.query(query, function (err, data) {
